@@ -6,7 +6,7 @@
 	License: MIT
 */
 
-var camera = (function() {
+export default function camera() {
 	var options;
 	var video, canvas, context;
 	var renderTimer;
@@ -30,7 +30,7 @@ var camera = (function() {
 				} else {
 					video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
 				}
-				
+
 				initCanvas();
 			}, options.onError);
 		} else {
@@ -108,4 +108,4 @@ var camera = (function() {
 
 		stop: stopCapture
 	};
-})();
+};
