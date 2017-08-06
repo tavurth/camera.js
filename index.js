@@ -7,11 +7,11 @@
 */
 
 export default function camera() {
-	var options;
-	var video, canvas, context;
-	var renderTimer;
+	let options;
+	let video, canvas, context;
+	let renderTimer;
 
-	function initVideoStream() {
+	this.initVideoStream() => {
 		video = document.createElement("video");
 		video.setAttribute('width', options.width);
 		video.setAttribute('height', options.height);
@@ -22,7 +22,7 @@ export default function camera() {
 		if (navigator.getUserMedia) {
 			navigator.getUserMedia({
 				video: true
-			}, function(stream) {
+			}, stream => {
 				options.onSuccess();
 
 				if (video.mozSrcObject !== undefined) { // hack for Firefox < 19
@@ -31,14 +31,14 @@ export default function camera() {
 					video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
 				}
 
-				initCanvas();
+				this.initCanvas();
 			}, options.onError);
 		} else {
 			options.onNotSupported();
 		}
-	}
+	};
 
-	function initCanvas() {
+	this.initCanvas = () => {
 		canvas = options.targetCanvas || document.createElement("canvas");
 		canvas.setAttribute('width', options.width);
 		canvas.setAttribute('height', options.height);
@@ -51,40 +51,40 @@ export default function camera() {
 			context.scale(-1, 1);
 		}
 
-		startCapture();
-	}
+		this.startCapture();
+	};
 
-	function startCapture() {
+	this.startCapture = () => {
 		video.play();
 
-		renderTimer = setInterval(function() {
+		renderTimer = setInterval(() => {
 			try {
 				context.drawImage(video, 0, 0, video.width, video.height);
 				options.onFrame(canvas);
 			} catch (e) {
-				// TODO
+                console.warn('Camera.JS: Failed to draw image to canvas');
 			}
 		}, Math.round(1000 / options.fps));
-	}
+	};
 
-	function stopCapture() {
-		pauseCapture();
+	this.stopCapture = () => {
+		this.pauseCapture();
 
 		if (video.mozSrcObject !== undefined) {
 			video.mozSrcObject = null;
 		} else {
 			video.src = "";
 		}
-	}
+	};
 
-	function pauseCapture() {
+	this.pauseCapture = () => {
 		if (renderTimer) clearInterval(renderTimer);
 		video.pause();
-	}
+	};
 
 	return {
-		init: function(captureOptions) {
-			var doNothing = function(){};
+		init: captureOptions => {
+			let doNothing = () => {};
 
 			options = captureOptions || {};
 
@@ -99,13 +99,13 @@ export default function camera() {
 			options.onNotSupported = options.onNotSupported || doNothing;
 			options.onFrame = options.onFrame || doNothing;
 
-			initVideoStream();
+			this.initVideoStream();
+
+            return this;
 		},
 
-		start: startCapture,
-
-		pause: pauseCapture,
-
-		stop: stopCapture
+		stop: this.stopCapture,
+		pause: this.pauseCapture,
+		start: this.startCapture
 	};
 };
