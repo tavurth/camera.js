@@ -8,13 +8,12 @@
 
 export default function camera() {
 	let options;
-	let video, canvas, context;
 	let renderTimer;
 
 	this.initVideoStream = () => {
-		video = document.createElement("video");
-		video.setAttribute('width', options.width);
-		video.setAttribute('height', options.height);
+		this.video = document.createElement("video");
+		this.video.setAttribute('width', options.width);
+		this.video.setAttribute('height', options.height);
 
 		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 		window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
@@ -25,10 +24,10 @@ export default function camera() {
 			}, stream => {
 				options.onSuccess();
 
-				if (video.mozSrcObject !== undefined) { // hack for Firefox < 19
-					video.mozSrcObject = stream;
+				if (this.video.mozSrcObject !== undefined) { // hack for Firefox < 19
+					this.video.mozSrcObject = stream;
 				} else {
-					video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+					this.video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
 				}
 
 				this.initCanvas();
@@ -39,30 +38,30 @@ export default function camera() {
 	};
 
 	this.initCanvas = () => {
-		canvas = options.targetCanvas || document.createElement("canvas");
-		canvas.setAttribute('width', options.width);
-		canvas.setAttribute('height', options.height);
+		this.canvas = options.targetCanvas || document.createElement("canvas");
+		this.canvas.setAttribute('width', options.width);
+		this.canvas.setAttribute('height', options.height);
 
-		context = canvas.getContext('2d');
+		this.context = this.canvas.getContext('2d');
 
 		// mirror video
 		if (options.mirror) {
-			context.translate(canvas.width, 0);
-			context.scale(-1, 1);
+			this.context.translate(this.canvas.width, 0);
+			this.context.scale(-1, 1);
 		}
 
 		this.startCapture();
 	};
 
 	this.startCapture = () => {
-		video.play();
+		this.video.play();
 
 		renderTimer = setInterval(() => {
 			try {
-				context.drawImage(video, 0, 0, video.width, video.height);
-				options.onFrame(canvas);
+				this.context.drawImage(this.video, 0, 0, this.video.width, this.video.height);
+				options.onFrame(this.canvas);
 			} catch (e) {
-                console.warn('Camera.JS: Failed to draw image to canvas');
+                // console.warn('Camera.JS: Failed to draw image to canvas');
 			}
 		}, Math.round(1000 / options.fps));
 	};
@@ -70,16 +69,16 @@ export default function camera() {
 	this.stopCapture = () => {
 		this.pauseCapture();
 
-		if (video.mozSrcObject !== undefined) {
-			video.mozSrcObject = null;
+		if (this.video.mozSrcObject !== undefined) {
+			this.video.mozSrcObject = null;
 		} else {
-			video.src = "";
+			this.video.src = "";
 		}
 	};
 
 	this.pauseCapture = () => {
 		if (renderTimer) clearInterval(renderTimer);
-		video.pause();
+		this.video.pause();
 	};
 
 	return {
