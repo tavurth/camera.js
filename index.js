@@ -61,7 +61,7 @@ export default function camera() {
 				this.context.drawImage(this.video, 0, 0, this.video.width, this.video.height);
 				options.onFrame(this.canvas);
 			} catch (e) {
-                // console.warn('Camera.JS: Failed to draw image to canvas');
+                console.warn('Camera.JS: Failed to draw image to canvas');
 			}
 		}, Math.round(1000 / options.fps));
 	};
