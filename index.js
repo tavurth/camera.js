@@ -11,7 +11,7 @@ export default function camera() {
 	let video, canvas, context;
 	let renderTimer;
 
-	this.initVideoStream() => {
+	this.initVideoStream = () => {
 		video = document.createElement("video");
 		video.setAttribute('width', options.width);
 		video.setAttribute('height', options.height);
